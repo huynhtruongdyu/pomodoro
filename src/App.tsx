@@ -1,17 +1,40 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import FarmLogo from './assets/logo.png';
-import { invoke } from '@tauri-apps/api/tauri';
-import './App.css';
+import {
+  isPermissionGranted,
+  requestPermission,
+  sendNotification,
+} from "@tauri-apps/api/notification";
+import { invoke } from "@tauri-apps/api/tauri";
+import { useEffect, useState } from "react";
+import "./App.css";
+import FarmLogo from "./assets/logo.png";
+import reactLogo from "./assets/react.svg";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState('');
-  const [name, setName] = useState('');
+  const [greetMsg, setGreetMsg] = useState("");
+  const [name, setName] = useState("");
 
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setGreetMsg(await invoke('greet', { name }));
+    setGreetMsg(await invoke("greet", { name }));
   }
+
+  useEffect(() => {
+    isNotiPermissionGranted().then((permissionGranted) => {
+      if (permissionGranted) {
+        sendNotification("Tauri is awesome!");
+        sendNotification({ title: "TAURI", body: "Tauri is awesome!" });
+      }
+    });
+  }, []);
+
+  const isNotiPermissionGranted = async () => {
+    let permissionGranted = await isPermissionGranted();
+    if (!permissionGranted) {
+      const permission = await requestPermission();
+      permissionGranted = permission === "granted";
+    }
+    return permissionGranted;
+  };
 
   return (
     <div className="container">
@@ -47,6 +70,8 @@ function App() {
       </form>
 
       <p>{greetMsg}</p>
+
+      {/* <button onClick={()=>}>Ping</button> */}
     </div>
   );
 }
