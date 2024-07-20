@@ -71,7 +71,16 @@ function App() {
 
       <p>{greetMsg}</p>
 
-      {/* <button onClick={()=>}>Ping</button> */}
+      <button
+        onClick={() =>
+          sendNotification({
+            title: "Pomodoro: {task_name}",
+            body: "good job bro!",
+          })
+        }
+      >
+        Ping
+      </button>
     </div>
   );
 }
